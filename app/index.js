@@ -12,7 +12,8 @@ var express = require('express'),
 
 // submodules:
 var routes = require('./routes'),
-	user = require('./routes/user');
+	user = require('./routes/user'),
+	paths = require('./paths');
 
 
 // initialization.
@@ -20,16 +21,34 @@ var app = express();
 
 
 // configuration.
-app.configure(function(){
+app.configure(function appConfig() {
+
 	app.set('port', process.env.PORT || 3000);
-	app.set('views', __dirname + '/views');
-	app.set('view engine', 'jade');
+
+	// HBS (handlebars templating)
+	// ▼▼▼
+	require('./configure/hbs')(app);
+
+	// LESS (css)
+	// ▼▼▼▼
+	require('./configure/less')(app);
+
 	app.use(express.favicon());
 	app.use(express.logger('dev'));
 	app.use(express.bodyParser());
 	app.use(express.methodOverride());
 	app.use(app.router);
-	app.use(express.static(path.join(__dirname, 'public')));
+
+	/**
+	 * STATIC FILES
+	 * ▼▼▼▼▼▼ ▼▼▼▼▼
+	 */
+	app.use( express.static(path.join(__dirname, 'public')) );
+	app.use( express.static(path.join(__dirname, 'public_built')) );
+	/**
+	 * ▲▲▲▲▲▲ ▲▲▲▲▲
+	 * STATIC FILES
+	 */
 });
 
 // specialized configs.
